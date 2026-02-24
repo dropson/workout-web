@@ -7,12 +7,11 @@ class AuthService {
   async register(data: RegisterDto) {
     await this.getCsrfCookie();
     const response = await apiClient.post(AUTH_ENDPOINTS.REGISTER, data)
-
     if (response.data.data.token) {
       this.setAccessToken(response.data.data.token)
     }
 
-    return response.data
+    return response.data.data
   }
 
   async getCsrfCookie(): Promise<void> {
@@ -22,7 +21,9 @@ class AuthService {
   async login(credentials: LoginDto) {
     await this.getCsrfCookie();
     const response = await apiClient.post(AUTH_ENDPOINTS.LOGIN, credentials)
-    this.setAccessToken(response.data.data.token)
+    if (response.data.data.token) {
+        this.setAccessToken(response.data.data.token)
+      }
     return response.data.data
   }
 
@@ -37,7 +38,6 @@ class AuthService {
         const cookieOptions = { domain: '.workout.test', path: '/' };
         Cookies.remove('XSRF-TOKEN', cookieOptions);
         Cookies.remove('laravel_session', cookieOptions);
-
 
         if (typeof window !== 'undefined') {
             window.location.href = '/auth/login';
@@ -62,18 +62,6 @@ class AuthService {
     })
   }
 
-//   getAccessToken(): string | null {
-//     if (typeof window === 'undefined') return null
-//     return localStorage.getItem('accessToken')
-//   }
-
-//   private setAccessToken(token: string) {
-//     localStorage.setItem('accessToken', token)
-//   }
-
-//   private removeAccessToken() {
-//     localStorage.removeItem('accessToken')
-//   }
 }
 
 export const authService = new AuthService()

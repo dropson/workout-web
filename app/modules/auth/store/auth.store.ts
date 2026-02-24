@@ -17,7 +17,8 @@ export const useAuthStore = create<AuthContextValue>((set) => ({
             }
 
             const profile = await authService.getProfile()
-            set({ user: profile.data })
+
+            set({ user: profile })
         } catch {
             set({ user: null })
         } finally {
@@ -29,10 +30,10 @@ export const useAuthStore = create<AuthContextValue>((set) => ({
 
         try {
             set({ isLoading: true })
-            const response = await authService.login(credentials)
-            set({ user: response.user })
+            const {user} = await authService.login(credentials)
+            set({ user })
             toast.success('Welcome back')
-            return response
+            return user;
 
         } catch (error: any) {
 
@@ -47,7 +48,7 @@ export const useAuthStore = create<AuthContextValue>((set) => ({
         try {
             set({ isLoading: true })
             const response = await authService.register(data)
-            set({ user: response.data.user })
+            set({ user: response.user })
 
             toast.success('Account created')
         } catch (error: any) {
